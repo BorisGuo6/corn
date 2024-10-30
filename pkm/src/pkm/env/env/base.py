@@ -363,6 +363,9 @@ class EnvBase(EnvIface):
                                        dtype=bool,
                                        device=self.device)
 
+    def __len__(self):
+        return self.num_env
+
     @property
     def device(self):
         return self._device

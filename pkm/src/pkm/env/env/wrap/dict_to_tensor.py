@@ -9,6 +9,7 @@ import torch as th
 from gym import spaces
 
 from icecream import ic
+from pkm.util.torch_util import dcn
 
 
 class DictToTensor(ObservationWrapper):
@@ -24,6 +25,9 @@ class DictToTensor(ObservationWrapper):
                              for k in self._keys], axis=0)
         self._observation_space = spaces.Box(lo, hi)
 
+    def __len__(self):
+        return self.num_env
+
     @property
     def action_space(self):
         return self.env.action_space
@@ -33,7 +37,16 @@ class DictToTensor(ObservationWrapper):
         return self._observation_space
 
     def _to_tensor(self, obs: Dict[str, th.Tensor]) -> th.Tensor:
-        return th.cat([obs[k] for k in self._keys], dim=-1)
+        return th.cat([obs[k] for k in self._keys], dim=-1).detach().cpu().numpy()
+
+    def step(self, *args, **kwds):
+        obs, rew, don, inf = super().step(*args, **kwds)
+        inf_out = [{} for _ in range(self.num_env)]
+        #for i in range(self.num_env):
+        #    inf_out[i] = {k:inf[k][i] for k in inf.keys()}
+        #trc = inf['timeout']
+        #return obs, rew, don, trc, inf_out
+        return obs, dcn(rew), dcn(don), inf_out
 
 
 class MergeKeys(ObservationWrapper):

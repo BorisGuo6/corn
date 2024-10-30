@@ -3,9 +3,9 @@
 set -exu
 
 # CONFIGURE DATA PATHS
-IG_PATH="/path/to/isaacgym"
+IG_PATH="/home/ycho/repo/isaacgym"
 CACHE_PATH="/home/${USER}/.cache/pkm"
-DATA_PATH="/path/to/data/"
+DATA_PATH="/opt/datasets/"
 
 # Figure out repository root.
 SCRIPT_DIR="$( cd "$( dirname $(realpath "${BASH_SOURCE[0]}") )" && pwd )"

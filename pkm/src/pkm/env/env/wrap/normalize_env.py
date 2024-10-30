@@ -114,6 +114,8 @@ class NormalizeEnv(WrapperEnv):
         if action is None:
             return action
 
+        action = th.as_tensor(action,
+                device=self.device)
         if not in_place:
             action = action.clone()
 

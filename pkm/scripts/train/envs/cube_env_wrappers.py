@@ -1249,6 +1249,7 @@ class ICPEmbObs(ObservationWrapper):
                 'group_type': 'fps',
                 'patch_type': 'mlp',
             })
+        flat: bool = False
 
         def __post_init__(self):
             self.icp.headers = ()
@@ -1268,10 +1269,11 @@ class ICPEmbObs(ObservationWrapper):
         else:
             num_keys = len(cfg.icp.keys)
         num_token = num_keys + num_patch
+        shape = (num_token*embed_size,) if cfg.flat else (num_token, embed_size)
+        self.flat = cfg.flat
         obs_space, update_fn = add_obs_field(env.observation_space,
                                              key,
-                                             spaces.Box(-np.inf, +np.inf,
-                                                        (num_token, embed_size)))
+                                             spaces.Box(-np.inf, +np.inf, shape))
         self._obs_space = obs_space
         self._update_fn = update_fn
         self._cloud_key = cloud_key
@@ -1289,6 +1291,8 @@ class ICPEmbObs(ObservationWrapper):
         with th.inference_mode():
             ctx = {}
             _, emb = self.encoder(obs[self._cloud_key], obs)
+        if self.flat:
+            emb = emb.flatten(start_dim=-2)
         return self._update_fn(obs, emb)
 
 
