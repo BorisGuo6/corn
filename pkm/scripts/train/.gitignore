@@ -3,3 +3,4 @@ vit_pretrained_model
 wandb/
 models/
 summaries/
+d3rlpy_logs/

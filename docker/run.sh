@@ -34,4 +34,4 @@ docker run -it \
     --privileged \
     --gpus all \
     "$@" \
-    "pkm:latest"
+    "corn:latest"

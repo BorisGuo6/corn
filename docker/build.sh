@@ -2,7 +2,7 @@
 
 set -ex
 
-IMAGE_TAG='pkm'
+IMAGE_TAG='corn'
 
 # NOTE: Set context directory relative to this file.
 CONTEXT_DIR="$( cd "$( dirname $(realpath "${BASH_SOURCE[0]}") )" && pwd )"

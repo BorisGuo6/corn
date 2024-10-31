@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.3
 # TODO: Consider swapping base image depending on availability of graphics device.
-ARG BASE_IMAGE=nvidia/cuda:11.3.1-devel-ubuntu20.04
+ARG BASE_IMAGE=nvidia/cuda:11.8.0-devel-ubuntu20.04
+
 
 FROM ${BASE_IMAGE} as base
 
@@ -68,18 +69,19 @@ RUN apt-get update \
     zip \
     unzip \
     make \
-    gcc-8 \
-    g++-8 \
+    gcc-9 \
+    g++-9 \
     vulkan-utils \
     mesa-vulkan-drivers \
     pigz \
     git \
     libegl1 \
-    git-lfs
+    git-lfs \
+    && rm -rf /var/lib/apt/lists*
 
-# Force gcc 8 to avoid CUDA 10 build issues on newer base OS
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 8
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 8
+# Force gcc 9 to avoid CUDA 10 build issues on newer base O
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 9
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
 
 # WAR for eglReleaseThread shutdown crash in libEGL_mesa.so.0 (ensure it's never detected/loaded)
 # Can't remove package libegl-mesa0 directly (because of libegl1 which we need)
@@ -138,10 +140,10 @@ RUN printf 'export CUDA_HOME=/usr/local/cuda\nexport LD_LIBRARY_PATH="${LD_LIBRA
 # comptibility between pytorch and tensorboard.
 RUN python3 -m pip install --upgrade \
     setuptools==59.5.0 \
-    torch==1.11.0+cu113 \
-    torchvision==0.12.0+cu113 \
+    torch==2.2.2+cu118 \
+    torchvision==0.17.2+cu118 \
     tensorboard \
-    --extra-index-url https://download.pytorch.org/whl/cu113
+    --extra-index-url https://download.pytorch.org/whl/cu118
 
 # Install python utilities, RL,
 # geometry processing / IO, rendering,
@@ -151,7 +153,6 @@ RUN python3 -m pip install --upgrade \
     tqdm \
     trimesh \
     open3d \
-    pybullet_rendering \
     pyrender \
     einops \
     opencv-python
@@ -161,45 +162,24 @@ RUN python3 -m pip install --upgrade \
 RUN python3 -m pip install --upgrade \
     rtree fvcore iopath
 RUN PY_VERSION_MINOR="$(python3 -c 'import sys; print(sys.version_info.minor)')" && \
-    python3 -m pip install --no-index --no-cache --upgrade \ 
-    -f "https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py3${PY_VERSION_MINOR}_cu113_pyt1110/download.html" \
-    pytorch3d
+    TORCH_CUDA_ARCH_LIST='Ampere' FORCE_CUDA=1 CFLAGS="-fpermissive" CC=gcc-9 CXX=g++-9 \
+    python3 -m pip install --no-index --no-cache --upgrade \
+    "git+https://github.com/facebookresearch/pytorch3d.git@v0.7.7"
 
 # NOTE: pytorch-points3d
 RUN python3 -m pip install --upgrade --no-index \
-    -f 'https://data.pyg.org/whl/torch-1.11.0+cu113.html' \
+    -f 'https://data.pyg.org/whl/torch-2.2.2+cu118.html' \
     torch-scatter torch-sparse torch-cluster torch-spline-conv
-
-# pytorch-geometric should be installed separately after build docker
-# pytorch-geometric
-# RUN python3 -m pip install --upgrade \
-#     torch-geometric
-
-# NOTE: below lines require compilation, so
-# it does not work without `nvidia-container-runtime`.
-# http://arnon.dk/matching-sm-architectures-arch-and-gencode-for-various-nvidia-cards/
-# Reference:
-# https://stackoverflow.com/questions/59691207/docker-build-with-nvidia-runtime
-# https://github.com/NVIDIA/nvidia-docker/wiki/Advanced-topics#default-runtime
-ENV TORCH_CUDA_ARCH_LIST='Ampere'
-# RUN FORCE_CUDA=1 python3 -m pip install \
-# #     torch-points-kernels
-# RUN python3 -m pip install --upgrade \
-#     torch-points3d
 
 # Install `nvdiffrast` for fast mesh rasterization.
 RUN python3 -m pip install --upgrade \
     git+https://github.com/NVlabs/nvdiffrast.git
 
 # Install PySDF for signed-distance function generations.
-# Install torchmcubes for visualization.
 # Install yourdfpy for loading URDF files.
 RUN python3 -m pip install --upgrade \
     yourdfpy \
     pysdf 
-# Not required for now
-# RUN python3 -m pip install --upgrade \
-#     git+https://github.com/tatsy/torchmcubes.git
 
 RUN python3 -m pip install --upgrade \
     hydra-core \
@@ -214,12 +194,7 @@ RUN python3 -m pip install --upgrade \
 
 # Dataset ...
 RUN python3 -m pip install --upgrade \
-    webdataset \
-    graspnetAPI
-
-# # Extra package (MVP)
-RUN python3 -m pip install --upgrade \
-    git+https://github.com/ir413/mvp
+    webdataset
 
 # Upgrade Open3D for visualization
 RUN python3 -m pip install open3d --upgrade
