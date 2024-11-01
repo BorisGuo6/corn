@@ -172,8 +172,6 @@ class NormalizeEnv(WrapperEnv):
             step = self.__run_step
         if self.writer is not None:
             return self.writer.add_scalar(k, v, global_step=step)
-        else:
-            print(F'{k}={v}')
 
     def _log(self):
         cfg = self.cfg

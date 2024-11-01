@@ -6,6 +6,7 @@ if not hasattr(np, 'float'):
 from isaacgym import gymtorch
 
 from typing import Optional, Iterable, Dict
+from dataclasses import replace
 from icecream import ic
 import torch as th
 from gym import spaces
@@ -15,7 +16,7 @@ from pkm.util.hydra_cli import hydra_cli
 from pkm.util.torch_util import dcn
 from pkm.env.env.wrap.base import ObservationWrapper
 
-from train_ppo_arm import Config, setup, set_seed, recursive_replace_map, load_env
+from train_ppo_arm import Config, setup, set_seed, load_env
 
 
 class WrapD3RL(ObservationWrapper):
@@ -70,8 +71,8 @@ def main(cfg: Config):
     path = setup(cfg)
     seed = set_seed(cfg.env.seed)
     ic.configureOutput(includeContext=True)
-    cfg = recursive_replace_map(cfg, {'finalize': True})
-    cfg, env = load_env(cfg, path)
+    cfg = replace(cfg, finalize=True)
+    cfg, env = load_env(cfg, path, freeze_env=True)
     env = WrapD3RL(env)
 
     # prepare algorithm
