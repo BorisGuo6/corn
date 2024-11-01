@@ -21,6 +21,7 @@ from show_ppo_arm import (Config, load_env, set_seed, map_struct, load_agent)
 @dataclass
 class MyConfig(Config):
     data_size: int = 1_000_000
+    data_path: str = '/tmp/corn-data'
 
 
 class SerializeEpisodes(WrapperEnv):
@@ -28,17 +29,17 @@ class SerializeEpisodes(WrapperEnv):
     Run environments in parallel and save episodes in the order of completion.
     """
 
-    def __init__(self, env):
+    def __init__(self, env, out_path: str):
         super().__init__(env)
         keys = sorted(list(env.observation_space.keys()))
         self._keys = list(keys)
 
         self.data = [[] for _ in range(self.num_env)]
 
-        self.out_path = Path('/tmp/data/')
+        self.out_path = Path(out_path)
         self.out_path.mkdir(parents=True, exist_ok=True)
         # NOTE(ycho): start the index from previous export results
-        self.eps_count = len(self.out_path.glob('*.pkl'))
+        self.eps_count = len(list(self.out_path.glob('*.pkl')))
 
         self.prev_obs = None
         self.prev_done = None
@@ -122,7 +123,7 @@ def main(cfg: MyConfig):
                         path,
                         freeze_env=True,
                         check_viewer=False)
-    env = SerializeEpisodes(env)
+    env = SerializeEpisodes(env, cfg.data_path)
 
     # Update cfg elements from `env`.
     obs_space = map_struct(
