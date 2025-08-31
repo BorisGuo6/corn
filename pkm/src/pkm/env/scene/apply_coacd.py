@@ -5,7 +5,13 @@ import os
 import trimesh
 import coacd
 import numpy as np
-import pymeshlab
+# Try to import pymeshlab, but handle the case when it's not available
+try:
+    import pymeshlab
+    PYMESHLAB_AVAILABLE = True
+except ImportError:
+    PYMESHLAB_AVAILABLE = False
+    print("Warning: pymeshlab not available, mesh simplification will be disabled")
 from pathlib import Path
 import tempfile
 from typing import Optional, Dict, Any
@@ -81,7 +87,8 @@ def apply_coacd(cfg: Config, f_in: str,
     if aux is not None:
         aux['num_part'] = len(mesh_parts)
 
-    if cfg.simplify:
+    # Only try to simplify if pymeshlab is available and simplify is enabled
+    if cfg.simplify and PYMESHLAB_AVAILABLE:
         with tempfile.TemporaryDirectory() as tmpdir:
             sources = []
             for i, p in enumerate(mesh_parts):
@@ -109,6 +116,10 @@ def apply_coacd(cfg: Config, f_in: str,
             scene.export(f_out)
 
     else:
+        # If pymeshlab is not available or simplify is disabled, export without simplification
+        if cfg.simplify and not PYMESHLAB_AVAILABLE:
+            print("Warning: Mesh simplification requested but pymeshlab not available. Exporting without simplification.")
+        
         scene = trimesh.Scene()
         for p in mesh_parts:
             scene.add_geometry(p)
