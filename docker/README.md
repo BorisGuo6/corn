@@ -29,9 +29,9 @@ Note that we assume availability of NVIDIA GPUs during docker build _and_ deploy
 Before running the docker image, check that the following directories are available in your host system:
 
 ```
-IG_PATH="/home/corn/isaacgym"
-CACHE_PATH="/home/corn/.cache/pkm"
-DATA_PATH="/home/corn/datasets/"
+IG_PATH="/home/boris/workspace/LLM_TAMP/3rdparty/corn/isaacgym"
+CACHE_PATH="/home/boris/.cache/pkm"
+DATA_PATH="/home/boris/workspace/LLM_TAMP/3rdparty/corn/data/"
 ```
 
 Otherwise, configure the directories in [run.sh](./run.sh) so that `${IG_PATH}` refers to a directory

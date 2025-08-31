@@ -302,3 +302,4 @@ wandb/
 *.ckpt
 *.ipynb
 events.*
+/data/DGN

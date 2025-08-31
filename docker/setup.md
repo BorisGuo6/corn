@@ -34,5 +34,5 @@ vim +PluginInstall
 
 ```bash
 python3 -m pip install -e /opt/isaacgym/python
-python3 -m pip install -e /home/user/corn/pkm
+python3 -m pip install -e /home/user/$(basename $(git rev-parse --show-toplevel))/pkm
 ```

@@ -34,7 +34,7 @@ Refer to the instructions in [docker](./docker)
 ### Isaac Gym
 
 First, download isaac gym from [here](https://developer.nvidia.com/isaac-gym) and extract them to the `${IG_PATH}` host directory
-that you configured during docker setup. By default, we assume this is `/home/corn/isaacgym`, which maps to`/opt/isaacgym` directory inside the container.
+that you configured during docker setup. By default, we assume this is `/home/boris/workspace/LLM_TAMP/3rdparty/corn/isaacgym`, which maps to`/opt/isaacgym` directory inside the container.
 In other words, the resulting directory structure should look like:
 
 ```bash

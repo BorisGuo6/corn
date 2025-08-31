@@ -1,0 +1,46 @@
+# CORN项目简化依赖包列表
+# 基于当前环境：Python 3.8 + PyTorch 2.4.1 + CUDA 12.x
+
+# 核心依赖（已安装）
+einops>=0.6.0
+omegaconf>=2.2.0
+icecream>=2.1.0
+hydra-core>=1.3.0
+gymnasium>=0.28.0
+
+# 3D和几何处理
+trimesh>=3.11.0
+yourdfpy>=0.0.50
+
+# 图像处理
+opencv-python>=4.5.0
+pillow>=8.0.0
+imageio>=2.15.0
+
+# 数据科学
+numpy>=1.21.0,<2.0.0
+scipy>=1.7.0
+pandas>=1.3.0
+scikit-learn>=1.0.0
+
+# 可视化
+matplotlib>=3.3.0
+seaborn>=0.11.0
+
+# 工具包
+tqdm>=4.60.0
+requests>=2.25.0
+httpx>=0.20.0
+
+# 文件系统
+iopath>=0.1.7
+portalocker>=2.0.0
+
+# 其他工具
+fvcore>=0.1.5
+tabulate>=0.8.0
+termcolor>=2.0.0
+yacs>=0.1.6
+
+# 注意：pytorch3d需要特殊处理，不能通过pip直接安装
+# 建议使用Docker容器或从源码编译
