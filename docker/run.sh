@@ -3,9 +3,9 @@
 set -exu
 
 # CONFIGURE DATA PATHS
-IG_PATH="/path/to/isaacgym"
+IG_PATH="/home/boris/workspace/LLM_TAMP/3rdparty/corn/isaacgym"
 CACHE_PATH="/home/${USER}/.cache/pkm"
-DATA_PATH="/path/to/data/"
+DATA_PATH="/home/boris/workspace/LLM_TAMP/3rdparty/corn/data/"
 
 # Figure out repository root.
 SCRIPT_DIR="$( cd "$( dirname $(realpath "${BASH_SOURCE[0]}") )" && pwd )"
